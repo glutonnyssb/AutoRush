@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/lib/
+build/windows/dist/
+build/windows/work/
+build/windows/*.ico
+.venv-build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# AutoRush runtime
+out/
+output/
+*.log
+cache/
+.autorush_cache/
+models/
+*.wav
+*.mp4
+*.mov
+!samples/*.json
+AutoRush_out/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,1393 @@
+{
+ "format": "autorush-transcript",
+ "version": 1,
+ "language": "fr",
+ "languages": [
+  "fr",
+  "en"
+ ],
+ "duration": 90.451,
+ "model": "synthetic-demo",
+ "meta": {
+  "source": "demo"
+ },
+ "segments": [
+  {
+   "start": 1.4,
+   "end": 5.003,
+   "text": "Salut a tous et bienvenue dans cette nouvelle video.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Salut",
+     "start": 1.4,
+     "end": 1.775,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "a",
+     "start": 1.81,
+     "end": 1.977,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "tous",
+     "start": 2.012,
+     "end": 2.335,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "et",
+     "start": 2.37,
+     "end": 2.589,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "bienvenue",
+     "start": 2.624,
+     "end": 3.207,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "dans",
+     "start": 3.242,
+     "end": 3.565,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "cette",
+     "start": 3.6,
+     "end": 3.975,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "nouvelle",
+     "start": 4.01,
+     "end": 4.541,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "video.",
+     "start": 4.576,
+     "end": 5.003,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 5.453,
+   "end": 8.236,
+   "text": "Euh aujourd'hui on va parler du tournoi.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Euh",
+     "start": 5.453,
+     "end": 5.724,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "aujourd'hui",
+     "start": 5.759,
+     "end": 6.446,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "on",
+     "start": 6.481,
+     "end": 6.7,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "va",
+     "start": 6.735,
+     "end": 6.954,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "parler",
+     "start": 6.989,
+     "end": 7.416,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "du",
+     "start": 7.451,
+     "end": 7.67,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "tournoi.",
+     "start": 7.705,
+     "end": 8.236,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 8.736,
+   "end": 12.957,
+   "text": "Je je pense que c'etait la meilleure edition depuis longtemps.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Je",
+     "start": 8.736,
+     "end": 8.955,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "je",
+     "start": 8.99,
+     "end": 9.209,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "pense",
+     "start": 9.244,
+     "end": 9.619,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "que",
+     "start": 9.654,
+     "end": 9.925,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "c'etait",
+     "start": 9.96,
+     "end": 10.439,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "la",
+     "start": 10.474,
+     "end": 10.693,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "meilleure",
+     "start": 10.728,
+     "end": 11.311,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "edition",
+     "start": 11.346,
+     "end": 11.825,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "depuis",
+     "start": 11.86,
+     "end": 12.287,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "longtemps.",
+     "start": 12.322,
+     "end": 12.957,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 13.357,
+   "end": 15.978,
+   "text": "Et euh du coup on va voir pourquoi.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Et",
+     "start": 13.357,
+     "end": 13.576,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "euh",
+     "start": 13.611,
+     "end": 13.882,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "du",
+     "start": 13.917,
+     "end": 14.136,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "coup",
+     "start": 14.171,
+     "end": 14.494,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "on",
+     "start": 14.529,
+     "end": 14.748,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "va",
+     "start": 14.783,
+     "end": 15.002,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "voir",
+     "start": 15.037,
+     "end": 15.36,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "pourquoi.",
+     "start": 15.395,
+     "end": 15.978,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 16.528,
+   "end": 20.645,
+   "text": "Mal- Malgre ca, il y a eu quelques problemes d'organisation.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Mal-",
+     "start": 16.528,
+     "end": 16.851,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Malgre",
+     "start": 16.886,
+     "end": 17.313,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "ca,",
+     "start": 17.348,
+     "end": 17.619,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "il",
+     "start": 17.654,
+     "end": 17.873,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "y",
+     "start": 17.908,
+     "end": 18.075,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "a",
+     "start": 18.11,
+     "end": 18.277,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "eu",
+     "start": 18.312,
+     "end": 18.531,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "quelques",
+     "start": 18.566,
+     "end": 19.097,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "problemes",
+     "start": 19.132,
+     "end": 19.715,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "d'organisation.",
+     "start": 19.75,
+     "end": 20.645,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 21.145,
+   "end": 24.234,
+   "text": "C'etait tres tres fort niveau niveau de jeu.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "C'etait",
+     "start": 21.145,
+     "end": 21.624,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "tres",
+     "start": 21.659,
+     "end": 21.982,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "tres",
+     "start": 22.017,
+     "end": 22.34,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "fort",
+     "start": 22.375,
+     "end": 22.698,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "niveau",
+     "start": 22.733,
+     "end": 23.16,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "niveau",
+     "start": 23.195,
+     "end": 23.622,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "de",
+     "start": 23.657,
+     "end": 23.876,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "jeu.",
+     "start": 23.911,
+     "end": 24.234,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 25.134,
+   "end": 27.617,
+   "text": "Les joueurs japonais etaient plutot...",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Les",
+     "start": 25.134,
+     "end": 25.405,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "joueurs",
+     "start": 25.44,
+     "end": 25.919,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "japonais",
+     "start": 25.954,
+     "end": 26.485,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "etaient",
+     "start": 26.52,
+     "end": 26.999,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "plutot...",
+     "start": 27.034,
+     "end": 27.617,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 28.317,
+   "end": 28.848,
+   "text": "Enfin...",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Enfin...",
+     "start": 28.317,
+     "end": 28.848,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 29.648,
+   "end": 31.409,
+   "text": "Ils etaient plutot bons...",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Ils",
+     "start": 29.648,
+     "end": 29.919,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "etaient",
+     "start": 29.954,
+     "end": 30.433,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "plutot",
+     "start": 30.468,
+     "end": 30.895,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "bons...",
+     "start": 30.93,
+     "end": 31.409,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 32.809,
+   "end": 34.108,
+   "text": "Non, je recommence.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Non,",
+     "start": 32.809,
+     "end": 33.132,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "je",
+     "start": 33.167,
+     "end": 33.386,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "recommence.",
+     "start": 33.421,
+     "end": 34.108,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 35.208,
+   "end": 39.181,
+   "text": "Les joueurs japonais etaient vraiment excellents cette annee.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Les",
+     "start": 35.208,
+     "end": 35.479,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "joueurs",
+     "start": 35.514,
+     "end": 35.993,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "japonais",
+     "start": 36.028,
+     "end": 36.559,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "etaient",
+     "start": 36.594,
+     "end": 37.073,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "vraiment",
+     "start": 37.108,
+     "end": 37.639,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "excellents",
+     "start": 37.674,
+     "end": 38.309,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "cette",
+     "start": 38.344,
+     "end": 38.719,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "annee.",
+     "start": 38.754,
+     "end": 39.181,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 39.881,
+   "end": 41.994,
+   "text": "On a eu Acola, Miya, Asimo...",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "On",
+     "start": 39.881,
+     "end": 40.1,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "a",
+     "start": 40.135,
+     "end": 40.302,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "eu",
+     "start": 40.337,
+     "end": 40.556,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Acola,",
+     "start": 40.591,
+     "end": 41.018,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Miya,",
+     "start": 41.053,
+     "end": 41.428,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Asimo...",
+     "start": 41.463,
+     "end": 41.994,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 42.794,
+   "end": 44.607,
+   "text": "Tous ces joueurs etaient...",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Tous",
+     "start": 42.794,
+     "end": 43.117,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "ces",
+     "start": 43.152,
+     "end": 43.423,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "joueurs",
+     "start": 43.458,
+     "end": 43.937,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "etaient...",
+     "start": 43.972,
+     "end": 44.607,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 45.507,
+   "end": 45.986,
+   "text": "Raru...",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Raru...",
+     "start": 45.507,
+     "end": 45.986,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 47.486,
+   "end": 48.785,
+   "text": "Non, je recommence.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Non,",
+     "start": 47.486,
+     "end": 47.809,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "je",
+     "start": 47.844,
+     "end": 48.063,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "recommence.",
+     "start": 48.098,
+     "end": 48.785,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 49.985,
+   "end": 54.252,
+   "text": "On a eu Acola, Miya, Asimo, Hurt, Zackray, Yoshidora et Raru.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "On",
+     "start": 49.985,
+     "end": 50.204,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "a",
+     "start": 50.239,
+     "end": 50.406,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "eu",
+     "start": 50.441,
+     "end": 50.66,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Acola,",
+     "start": 50.695,
+     "end": 51.122,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Miya,",
+     "start": 51.157,
+     "end": 51.532,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Asimo,",
+     "start": 51.567,
+     "end": 51.994,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Hurt,",
+     "start": 52.029,
+     "end": 52.404,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Zackray,",
+     "start": 52.439,
+     "end": 52.97,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Yoshidora",
+     "start": 53.005,
+     "end": 53.588,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "et",
+     "start": 53.623,
+     "end": 53.842,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "Raru.",
+     "start": 53.877,
+     "end": 54.252,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 55.052,
+   "end": 57.841,
+   "text": "Ces joueurs etaient pas extremement forts.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Ces",
+     "start": 55.052,
+     "end": 55.323,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "joueurs",
+     "start": 55.358,
+     "end": 55.837,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "etaient",
+     "start": 55.872,
+     "end": 56.351,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "pas",
+     "start": 56.386,
+     "end": 56.657,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "extremement",
+     "start": 56.692,
+     "end": 57.379,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "forts.",
+     "start": 57.414,
+     "end": 57.841,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 59.141,
+   "end": 59.672,
+   "text": "Attends.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Attends.",
+     "start": 59.141,
+     "end": 59.672,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 60.772,
+   "end": 64.179,
+   "text": "Ces joueurs etaient absolument redoutables en poule.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Ces",
+     "start": 60.772,
+     "end": 61.043,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "joueurs",
+     "start": 61.078,
+     "end": 61.557,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "etaient",
+     "start": 61.592,
+     "end": 62.071,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "absolument",
+     "start": 62.106,
+     "end": 62.741,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "redoutables",
+     "start": 62.776,
+     "end": 63.463,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "en",
+     "start": 63.498,
+     "end": 63.717,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "poule.",
+     "start": 63.752,
+     "end": 64.179,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 64.879,
+   "end": 67.662,
+   "text": "Le niveau global a explose cette saison.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Le",
+     "start": 64.879,
+     "end": 65.098,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "niveau",
+     "start": 65.133,
+     "end": 65.56,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "global",
+     "start": 65.595,
+     "end": 66.022,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "a",
+     "start": 66.057,
+     "end": 66.224,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "explose",
+     "start": 66.259,
+     "end": 66.738,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "cette",
+     "start": 66.773,
+     "end": 67.148,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "saison.",
+     "start": 67.183,
+     "end": 67.662,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 68.162,
+   "end": 72.579,
+   "text": "Et c'est exactement pour ca que la finale a ete aussi intense.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Et",
+     "start": 68.162,
+     "end": 68.381,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "c'est",
+     "start": 68.416,
+     "end": 68.791,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "exactement",
+     "start": 68.826,
+     "end": 69.461,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "pour",
+     "start": 69.496,
+     "end": 69.819,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "ca",
+     "start": 69.854,
+     "end": 70.073,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "que",
+     "start": 70.108,
+     "end": 70.379,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "la",
+     "start": 70.414,
+     "end": 70.633,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "finale",
+     "start": 70.668,
+     "end": 71.095,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "a",
+     "start": 71.13,
+     "end": 71.297,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "ete",
+     "start": 71.332,
+     "end": 71.603,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "aussi",
+     "start": 71.638,
+     "end": 72.013,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "intense.",
+     "start": 72.048,
+     "end": 72.579,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 75.179,
+   "end": 78.314,
+   "text": "Bon, on va passer a la suite du classement.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Bon,",
+     "start": 75.179,
+     "end": 75.502,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "on",
+     "start": 75.537,
+     "end": 75.756,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "va",
+     "start": 75.791,
+     "end": 76.01,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "passer",
+     "start": 76.045,
+     "end": 76.472,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "a",
+     "start": 76.507,
+     "end": 76.674,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "la",
+     "start": 76.709,
+     "end": 76.928,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "suite",
+     "start": 76.963,
+     "end": 77.338,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "du",
+     "start": 77.373,
+     "end": 77.592,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "classement.",
+     "start": 77.627,
+     "end": 78.314,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 78.914,
+   "end": 81.801,
+   "text": "The bracket was actually insane this year.",
+   "language": "en",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "The",
+     "start": 78.914,
+     "end": 79.185,
+     "probability": 0.95,
+     "language": "en"
+    },
+    {
+     "text": "bracket",
+     "start": 79.22,
+     "end": 79.699,
+     "probability": 0.95,
+     "language": "en"
+    },
+    {
+     "text": "was",
+     "start": 79.734,
+     "end": 80.005,
+     "probability": 0.95,
+     "language": "en"
+    },
+    {
+     "text": "actually",
+     "start": 80.04,
+     "end": 80.571,
+     "probability": 0.95,
+     "language": "en"
+    },
+    {
+     "text": "insane",
+     "start": 80.606,
+     "end": 81.033,
+     "probability": 0.95,
+     "language": "en"
+    },
+    {
+     "text": "this",
+     "start": 81.068,
+     "end": 81.391,
+     "probability": 0.95,
+     "language": "en"
+    },
+    {
+     "text": "year.",
+     "start": 81.426,
+     "end": 81.801,
+     "probability": 0.95,
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "start": 82.301,
+   "end": 85.454,
+   "text": "Franchement, personne n'avait predit ce resultat.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Franchement,",
+     "start": 82.301,
+     "end": 83.04,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "personne",
+     "start": 83.075,
+     "end": 83.606,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "n'avait",
+     "start": 83.641,
+     "end": 84.12,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "predit",
+     "start": 84.155,
+     "end": 84.582,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "ce",
+     "start": 84.617,
+     "end": 84.836,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "resultat.",
+     "start": 84.871,
+     "end": 85.454,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "start": 86.354,
+   "end": 89.651,
+   "text": "Merci d'avoir regarde, on se retrouve tres vite.",
+   "language": "fr",
+   "avg_logprob": -0.25,
+   "no_speech_prob": 0.0,
+   "words": [
+    {
+     "text": "Merci",
+     "start": 86.354,
+     "end": 86.729,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "d'avoir",
+     "start": 86.764,
+     "end": 87.243,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "regarde,",
+     "start": 87.278,
+     "end": 87.809,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "on",
+     "start": 87.844,
+     "end": 88.063,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "se",
+     "start": 88.098,
+     "end": 88.317,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "retrouve",
+     "start": 88.352,
+     "end": 88.883,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "tres",
+     "start": 88.918,
+     "end": 89.241,
+     "probability": 0.95,
+     "language": "fr"
+    },
+    {
+     "text": "vite.",
+     "start": 89.276,
+     "end": 89.651,
+     "probability": 0.95,
+     "language": "fr"
+    }
+   ]
+  }
+ ]
+}

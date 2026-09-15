@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autorush"
+version = "1.0.0"
+description = "Montage automatique de rushes facecam : silences, hesitations, reprises, zooms, export Premiere Pro."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "AutoRush" }]
+keywords = ["video", "editing", "premiere", "whisper", "facecam", "jumpcut"]
+
+dependencies = [
+    "numpy>=1.24,<3",
+    "soundfile>=0.12.1",
+]
+
+[project.optional-dependencies]
+transcribe = ["faster-whisper>=1.0.3"]
+gui = ["PySide6>=6.6"]
+dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.5", "pyinstaller>=6.6"]
+all = ["faster-whisper>=1.0.3", "PySide6>=6.6"]
+
+[project.scripts]
+autorush = "autorush.cli:main"
+
+[project.gui-scripts]
+autorush-gui = "autorush.gui.app:main"
+
+[tool.setuptools.packages.find]
+include = ["autorush*"]
+
+[tool.setuptools.package-data]
+autorush = ["gui/*.qss", "export/templates/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501", "B008"]

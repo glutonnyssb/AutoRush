@@ -1,0 +1,13 @@
+# --- Coeur (obligatoire) ---
+numpy>=1.24,<3
+soundfile>=0.12.1
+
+# --- Transcription (obligatoire pour l'analyse automatique) ---
+# faster-whisper embarque CTranslate2 : rapide sur CPU, encore plus sur GPU NVIDIA.
+faster-whisper>=1.0.3
+
+# --- Interface graphique Windows ---
+PySide6>=6.6
+
+# NOTE : ffmpeg et ffprobe ne sont pas des paquets Python.
+# Voir README.md -> "Installation de ffmpeg".
