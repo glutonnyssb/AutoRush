@@ -130,6 +130,50 @@ def test_sans_fondu_audio_aucune_transition(media_info, analysed, zoom_plan):
     assert not track.findall("transitionitem")
 
 
+def test_aucune_transition_ne_touche_la_piste_video(xml_root):
+    """``Cross Fade (+3dB)`` est une transition audio.
+
+    Posee sur une piste video, Premiere ne la reconnait pas et la remplace en
+    signalant un probleme de translation a chaque coupe.
+    """
+    root, _ = xml_root
+    for track in root.findall("sequence/media/video/track"):
+        assert not track.findall("transitionitem")
+
+
+def test_sans_transition_les_coupes_gardent_un_micro_fondu(
+    media_info, analysed, zoom_plan
+):
+    """Desactiver les transitions ne doit pas supprimer la protection anti-clic.
+
+    Sans transition ni fondu de niveau, chaque raccord devient une soudure
+    franche : le montage claque a chaque coupe.
+    """
+    writer = Fcp7Writer(
+        media_info,
+        analysed.timeline,
+        zoom_plan,
+        audio_crossfade=False,
+        audio_level_fallback=True,
+    )
+    root = ET.fromstring(writer.render())
+    track = root.find("sequence/media/audio/track")
+    assert not track.findall("transitionitem")
+    niveaux = [
+        effect
+        for effect in track.findall("clipitem/filter/effect")
+        if effect.findtext("effectid") == "audiolevels"
+    ]
+    assert niveaux, "il faut un fondu de niveau sur chaque plan"
+    for effect in niveaux:
+        keyframes = effect.findall("parameter/keyframe")
+        assert len(keyframes) >= 4
+        valeurs = [float(k.findtext("value")) for k in keyframes]
+        assert valeurs[0] == 0.0, "le plan doit ouvrir a zero"
+        assert valeurs[-1] == 0.0, "le plan doit fermer a zero"
+        assert max(valeurs) == 1.0, "le niveau doit atteindre le plein volume"
+
+
 # --------------------------------------------------------------------------- #
 # Zooms : le point critique
 # --------------------------------------------------------------------------- #

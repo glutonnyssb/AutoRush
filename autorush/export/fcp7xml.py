@@ -522,11 +522,12 @@ class Fcp7Writer:
             )
 
         transitions = self._transitions("\t\t\t\t\t")
-        fallback_fade = (
-            max(1, self.crossfade_frames)
-            if (self.audio_level_fallback and self.audio_crossfade)
-            else 0
-        )
+        # Le micro-fondu de niveau couvre les coupes qu'aucune transition ne
+        # traite : celles ou les poignees media manquent, et toutes les coupes
+        # quand les transitions sont desactivees. Le conditionner a
+        # ``audio_crossfade`` privait ``--no-crossfade`` de toute protection
+        # anti-clic, ce qui est l'inverse du but d'un repli.
+        fallback_fade = max(1, self.crossfade_frames) if self.audio_level_fallback else 0
 
         lines: list[str] = [
             '<?xml version="1.0" encoding="UTF-8"?>',
