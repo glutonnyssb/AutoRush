@@ -146,9 +146,11 @@ class RetakeSettings:
 
     enabled: bool = True
     #: similarite minimale quand un marqueur explicite ("je recommence") est present
-    similarity_with_marker: float = 0.52
-    #: similarite minimale sans marqueur (beaucoup plus severe)
-    similarity_without_marker: float = 0.78
+    similarity_with_marker: float = 0.32
+    #: similarite minimale sans marqueur (plus severe : la preuve doit venir
+    #: du seul vocabulaire). Mesure sur rush reel : une vraie reprise depasse
+    #: 0.56, deux phrases voisines du meme sujet montent au plus a 0.46.
+    similarity_without_marker: float = 0.50
     #: fenetre de recherche de la nouvelle tentative (secondes)
     search_window: float = 26.0
     #: nombre d'enonces separant au maximum deux tentatives
@@ -157,8 +159,10 @@ class RetakeSettings:
     min_shared_content_words: int = 2
     #: une tentative abandonnee de plus de N secondes demande un marqueur explicite
     long_attempt_duration: float = 7.5
-    #: nombre de mots de contenu uniques perdus tolere en supprimant une tentative
-    max_information_loss: int = 1
+    #: part de l'information de la tentative qui peut disparaitre. Compter les
+    #: mots perdus punissait les reprises qui abregent ("Au debut du Ultimate"
+    #: -> "Au debut") autant que celles qui perdent l'essentiel.
+    max_information_loss_ratio: float = 0.50
     #: au-dela de ce nombre de tokens, l'enonce est traite comme une phrase complete
     complete_utterance_tokens: int = 7
     #: confiance minimale pour supprimer reellement (sinon : signalement)
@@ -441,8 +445,8 @@ STYLE_PRESETS: dict[str, dict[str, dict[str, Any]]] = {
             "min_delete_confidence": 0.64,
         },
         "retake": {
-            "similarity_with_marker": 0.56,
-            "similarity_without_marker": 0.82,
+            "similarity_with_marker": 0.36,
+            "similarity_without_marker": 0.56,
             "min_delete_confidence": 0.64,
             "max_removed_speech_ratio": 0.5,
         },
@@ -480,8 +484,8 @@ STYLE_PRESETS: dict[str, dict[str, dict[str, Any]]] = {
             "min_delete_confidence": 0.60,
         },
         "retake": {
-            "similarity_with_marker": 0.52,
-            "similarity_without_marker": 0.78,
+            "similarity_with_marker": 0.32,
+            "similarity_without_marker": 0.50,
             "min_delete_confidence": 0.60,
             "max_removed_speech_ratio": 0.55,
         },
@@ -519,8 +523,8 @@ STYLE_PRESETS: dict[str, dict[str, dict[str, Any]]] = {
             "min_delete_confidence": 0.56,
         },
         "retake": {
-            "similarity_with_marker": 0.48,
-            "similarity_without_marker": 0.74,
+            "similarity_with_marker": 0.28,
+            "similarity_without_marker": 0.46,
             "min_delete_confidence": 0.56,
             "max_removed_speech_ratio": 0.62,
         },

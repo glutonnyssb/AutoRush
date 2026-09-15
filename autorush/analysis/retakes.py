@@ -23,10 +23,14 @@ La methode
 
 Garde-fous
 ----------
-* une phrase complete n'est jamais supprimee sans marqueur explicite **ou**
-  redemarrage litteral de la meme phrase ;
-* si supprimer une tentative ferait perdre des mots de contenu absents de la
-  bonne version, la confiance chute (protection contre la perte d'information) ;
+* une tentative n'est retenue que si elle montre un **redemarrage** : premiers
+  mots litteralement identiques, ou charpente commune avec ``B`` (meme attaque
+  ou meme chute, voir ``similarity.py``). Du vocabulaire partage ne suffit
+  jamais : deux phrases voisines d'un rush parlent forcement du meme sujet ;
+* une phrase complete voit sa confiance chuter, d'autant plus que le
+  redemarrage n'est pas prouve ;
+* si supprimer une tentative ferait perdre la majeure partie de son
+  information, la confiance chute (protection contre la perte d'information) ;
 * un marqueur isole ("Non.") entre deux bonnes phrases n'est jamais supprime :
   il est signale comme raccord suspect (voir ``seams.py``).
 """
@@ -50,6 +54,9 @@ BONUS_WEAK_MARKER = 0.08
 BONUS_RESTART_BASE = 0.10
 BONUS_RESTART_PER_TOKEN = 0.045
 BONUS_RESTART_CAP = 0.26
+#: redemarrage prouve par la seule charpente (sans marqueur) : preuve plus
+#: faible qu'un marqueur explicite, donc bonus plus mesure.
+BONUS_RESTART_STRUCTURE = 0.10
 BONUS_ABANDONED = 0.10
 BONUS_BETTER_VERSION = 0.06
 BONUS_SHORT_ATTEMPT = 0.05
@@ -157,6 +164,13 @@ def _passes_gate(
     threshold = (
         settings.similarity_with_marker if marker_between else settings.similarity_without_marker
     )
+    # Garde-fou : sans redemarrage visible, du vocabulaire commun ne prouve
+    # rien. Deux phrases voisines d'un meme rush partagent toujours le
+    # vocabulaire du sujet ("Voici le classement complet de cette saison." et
+    # "Le classement a beaucoup bouge en fin de saison." partagent la moitie
+    # de leurs mots de contenu sans etre deux tentatives de la meme phrase).
+    if not (similarity.restart_prefix or similarity.restart_structure):
+        return False
     shared_ok = (
         len(similarity.shared_content) >= settings.min_shared_content_words
         or similarity.restart_prefix
@@ -206,6 +220,12 @@ def _attempt_confidence(
     reasons: list[str] = []
     score = similarity.score
 
+    # Preuve d'un redemarrage : soit les premiers mots sont litteralement
+    # identiques, soit la charpente est commune (meme attaque ou meme chute).
+    # Le second cas couvre "Au debut du Ultimate, c'etait plutot les
+    # Etats-Unis..." / "Au debut, c'etait vraiment les Etats-Unis..." : aucun
+    # prefixe exact, mais la meme phrase est visiblement reprise.
+    restarted = similarity.restart_prefix or similarity.restart_structure
     restart_with_marker = similarity.restart_prefix and (group_strong or group_weak)
 
     if group_strong:
@@ -224,6 +244,9 @@ def _attempt_confidence(
         reasons.append(
             f"redemarrage litteral sur {similarity.prefix_tokens} mots identiques"
         )
+    elif similarity.restart_structure:
+        score += BONUS_RESTART_STRUCTURE
+        reasons.append("meme phrase redemarree (attaque ou chute identique)")
 
     if utterance.is_abandoned:
         score += BONUS_ABANDONED
@@ -238,21 +261,20 @@ def _attempt_confidence(
 
     # -- penalites -------------------------------------------------------- #
     if utterance.is_complete and not group_strong:
-        penalty = (
-            PENALTY_COMPLETE_WITH_RESTART if restart_with_marker else PENALTY_COMPLETE_NO_MARKER
-        )
+        penalty = PENALTY_COMPLETE_WITH_RESTART if restarted else PENALTY_COMPLETE_NO_MARKER
         score -= penalty
         reasons.append("prudence : la tentative est une phrase complete")
 
     # perte d'information : quand un redemarrage litteral est prouve, la fin de
     # la phrase est precisement ce que la personne corrige -> on ne compte que
     # les mots perdus situes dans le prefixe commun.
-    lost = (
-        similarity.lost_inside_prefix
-        if (restart_with_marker and similarity.restart_prefix)
-        else similarity.lost_content
-    )
-    if len(lost) > settings.max_information_loss:
+    if restart_with_marker and similarity.restart_prefix:
+        lost = similarity.lost_inside_prefix
+        excessive_loss = bool(lost)
+    else:
+        lost = similarity.lost_content
+        excessive_loss = similarity.loss_ratio > settings.max_information_loss_ratio
+    if excessive_loss:
         score -= PENALTY_INFORMATION_LOSS
         reasons.append(
             "prudence : "
