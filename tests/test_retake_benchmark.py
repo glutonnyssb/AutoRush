@@ -285,3 +285,145 @@ def test_la_version_allongee_reste_pleinement_contenue():
     assert result.containment == 1.0
     assert result.loss_ratio == 0.0
     assert not result.lost_content
+
+
+# --------------------------------------------------------------------------- #
+# Reprises a l'interieur d'un seul segment de transcription
+# --------------------------------------------------------------------------- #
+# faster-whisper livre des segments de plusieurs secondes. Une tentative ratee
+# et sa reprise y atterrissent regulierement ENSEMBLE, sans ponctuation entre
+# les deux. La detection compare les enonces entre eux : sans decoupage
+# prealable sur le redemarrage, elle ne voit rien du tout.
+
+#: (segment tel que Whisper le livre, fragment qui doit disparaitre)
+SEGMENTS_FUSIONNES: list[tuple[str, str]] = [
+    ("Et pourtant il faut savoir que ce n'est pas toujours ete le cas mais"
+     " pourtant en fait ca n'a pas toujours ete le cas.",
+     "il faut savoir"),
+    ("Au debut du Ultimate c'etait plutot les Etats-Unis qui roulaient sur tout"
+     " le monde au debut c'etait vraiment les Etats-Unis qui roulaient"
+     " completement sur tout le monde.",
+     "du ultimate"),
+    ("Ou plutot l'Amerique du Nord ou plus precisement l'Amerique du Nord"
+     " puisqu'en fait on avait les Mexicains dont MKLeo.",
+     "ou plutot"),
+    ("Malgre tout on avait quand meme pas mal de joueurs au Japon qui se"
+     " defendaient tres bien malgre tout on avait quand meme quelques"
+     " excellents joueurs au Japon.",
+     "se defendaient"),
+    ("On a eu Acola Miya Asimo on a eu Acola Miya Asimo Hurt Zackray Yoshidora"
+     " et Raru.",
+     "asimo on a eu"),
+]
+
+#: phrases normales, longues, qui ne doivent JAMAIS etre scindees
+SEGMENTS_NORMAUX: list[str] = [
+    "Le niveau global a explose cette saison et les joueurs europeens"
+    " progressent aussi beaucoup depuis le debut.",
+    "On a eu Acola Miya Asimo Hurt Zackray Yoshidora et Raru cette annee au"
+    " Japon.",
+    "C'etait vraiment vraiment tres tres fort le niveau de jeu de ces joueurs"
+    " japonais.",
+    "Le tournoi de Tokyo etait complet et le tournoi suivant aura lieu a Osaka"
+    " en septembre prochain.",
+    "Et pourtant les resultats ne suivent pas et pourtant tout le monde y"
+    " croyait encore hier soir.",
+    "Je pense que le niveau a beaucoup progresse mais je pense aussi que la"
+    " concurrence s'est renforcee.",
+    "Au debut de la saison il y avait douze equipes et a la fin il n'en restait"
+    " plus que quatre.",
+    "Voici le classement complet de cette saison et voila les resultats"
+    " detailles par region du monde.",
+]
+
+
+def test_un_segment_qui_contient_sa_reprise_est_scinde():
+    """Sans ce decoupage, la reprise reste invisible : rien n'est compare."""
+    from autorush.analysis.utterances import build_utterances
+
+    for segment, _ in SEGMENTS_FUSIONNES:
+        transcript = make_transcript([(segment, 1.0)])
+        utterances = build_utterances(transcript)
+        assert len(utterances) > 1, f"segment non scinde : {segment[:50]!r}"
+
+
+def test_la_reprise_interne_est_bien_nettoyee():
+    for segment, bafouillage in SEGMENTS_FUSIONNES:
+        transcript = make_transcript([(segment, 1.0)])
+        result = analyze(
+            transcript, Settings.for_style("dynamique"), None, transcript.duration
+        )
+        texte = final_text(result).lower()
+        assert bafouillage not in texte, (
+            f"{bafouillage!r} devrait disparaitre de {texte[:70]!r}"
+        )
+        assert texte.strip(), "le segment ne doit pas etre vide apres nettoyage"
+
+
+def test_une_phrase_normale_nest_jamais_scindee():
+    """Le decoupage sur redemarrage ne doit pas hacher les phrases valables."""
+    from autorush.analysis.utterances import build_utterances
+
+    for phrase in SEGMENTS_NORMAUX:
+        transcript = make_transcript([(phrase, 1.0)])
+        utterances = build_utterances(transcript)
+        assert len(utterances) == 1, f"phrase scindee a tort : {phrase[:50]!r}"
+
+
+def test_une_phrase_normale_ne_perd_aucun_mot():
+    for phrase in SEGMENTS_NORMAUX:
+        transcript = make_transcript([(phrase, 1.0)])
+        result = analyze(
+            transcript, Settings.for_style("dynamique"), None, transcript.duration
+        )
+        assert not result.removed_word_indices, f"mots retires de {phrase[:50]!r}"
+
+
+def test_bout_en_bout_sur_segmentation_reelle():
+    """Le rush entier, segmente comme faster-whisper le livre vraiment."""
+    from autorush.analysis.utterances import build_utterances
+
+    segments = [
+        ("Aujourd'hui quand on parle de Smash Ultimate il y a un point sur"
+         " lequel tout le monde est d'accord.", 0.5),
+        ("C'est que le Japon est devenu la region la plus forte.", 1.4),
+        (SEGMENTS_FUSIONNES[0][0], 1.8),
+        (SEGMENTS_FUSIONNES[1][0], 1.6),
+        (SEGMENTS_FUSIONNES[2][0], 1.3),
+        ("C'est simple il a fallu plusieurs annees pour que quelqu'un lui"
+         " prenne un tournoi.", 1.5),
+        (SEGMENTS_FUSIONNES[3][0], 1.7),
+        ("Je pense notamment a Zachray qui etait clairement l'un des meilleurs"
+         " joueurs du monde des le debut.", 1.4),
+        ("Mais globalement la scene semblait un petit peu un cran en dessous.", 1.6),
+        ("Ils jouaient des personnages un peu bizarres mais c'etait pas si"
+         " efficace que ca en fait.", 1.3),
+    ]
+    transcript = make_transcript(segments)
+    result = analyze(
+        transcript, Settings.for_style("dynamique"), None, transcript.duration
+    )
+    texte = final_text(result).lower()
+
+    # les quatre bafouillages fusionnes ont disparu
+    for _, bafouillage in SEGMENTS_FUSIONNES[:4]:
+        assert bafouillage not in texte, f"{bafouillage!r} subsiste"
+
+    # et tout le contenu utile est la
+    for garde in (
+        "smash ultimate",
+        "region la plus forte",
+        "n'a pas toujours ete le cas",
+        "roulaient completement",
+        "les mexicains",
+        "plusieurs annees",
+        "quelques excellents joueurs",
+        "zachray",
+        "un cran en dessous",
+        "personnages un peu bizarres",
+    ):
+        assert garde in texte, f"{garde!r} perdu"
+
+    assert len(build_utterances(transcript)) > len(segments), (
+        "les segments fusionnes doivent avoir ete scindes"
+    )

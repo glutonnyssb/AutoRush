@@ -24,6 +24,7 @@ from autorush.analysis.lexicon import (
     strong_marker_hits,
     weak_marker_hits,
 )
+from autorush.analysis.similarity import token_match, token_similarity
 from autorush.transcription.base import Transcript, Word
 from autorush.utils import normalize_text
 
@@ -33,6 +34,10 @@ DEFAULT_BREAK_GAP = 0.62
 HARD_BREAK_GAP = 1.15
 #: nombre maximal de mots dans un enonce (securite sur les longs monologues)
 MAX_WORDS = 48
+#: mots minimum de chaque cote pour scinder un enonce sur un redemarrage.
+#: En dessous, on est sur une repetition d'insistance ("tres tres fort"),
+#: pas sur deux tentatives de la meme phrase.
+MIN_RESTART_TAKE = 4
 
 
 @dataclass
@@ -241,6 +246,7 @@ def build_utterances(
 
     if isolate_markers:
         groups, reasons = _split_marker_groups(groups, reasons)
+    groups, reasons = _split_restart_groups(groups, reasons)
 
     utterances: list[Utterance] = []
     for i, words in enumerate(groups):
@@ -292,6 +298,66 @@ def _marker_split_point(words: list[Word]) -> int | None:
         if is_standalone_marker(prefix) and has_strong_marker(prefix):
             return length
     return None
+
+
+def _restart_split_point(tokens: list[str]) -> int | None:
+    """Trouve l'endroit ou un enonce recommence depuis son propre debut.
+
+    Le moteur de transcription livre des segments de plusieurs secondes : une
+    tentative ratee et sa reprise atterrissent regulierement dans le **meme**
+    enonce, ou la detection de reprises ne peut pas les voir puisqu'elle
+    compare les enonces entre eux.
+
+    On cherche donc le mot a partir duquel la personne redit le debut de sa
+    phrase, et on verifie la coupure avec la mesure de similarite : les deux
+    moities doivent se ressembler comme deux tentatives, pas comme deux
+    phrases voisines.
+    """
+    count = len(tokens)
+    if count < 2 * MIN_RESTART_TAKE:
+        return None
+    opening = tokens[0]
+    best_point: int | None = None
+    best_score = 0.0
+    second = tokens[1]
+    for point in range(MIN_RESTART_TAKE, count - MIN_RESTART_TAKE + 1):
+        # Une reprise redit l'attaque de la phrase. Le mot de liaison est
+        # souvent le seul a changer ("Et pourtant..." repris en "Mais
+        # pourtant...") : on accepte donc aussi un decalage d'un mot. Ce
+        # filtre ne fait que proposer des candidats ; la similarite tranche.
+        redit_attaque = token_match(tokens[point], opening) or (
+            point + 1 < count and token_match(tokens[point + 1], second)
+        )
+        if not redit_attaque:
+            continue
+        similarity = token_similarity(tokens[:point], tokens[point:])
+        if not (similarity.restart_prefix or similarity.restart_structure):
+            continue
+        if similarity.score > best_score:
+            best_point, best_score = point, similarity.score
+    return best_point
+
+
+def _split_restart_groups(
+    groups: list[list[Word]], reasons: list[str]
+) -> tuple[list[list[Word]], list[str]]:
+    """Scinde les enonces qui contiennent leur propre reprise."""
+    out_groups: list[list[Word]] = []
+    out_reasons: list[str] = []
+    for words, reason in zip(groups, reasons, strict=False):
+        # les indices doivent correspondre aux mots : on ne filtre rien, et on
+        # renonce si un mot n'a pas de forme normalisee (ponctuation seule)
+        tokens = [w.norm for w in words]
+        point = _restart_split_point(tokens) if all(tokens) else None
+        if point is None:
+            out_groups.append(words)
+            out_reasons.append(reason)
+            continue
+        out_groups.append(words[:point])
+        out_reasons.append(reason)
+        out_groups.append(words[point:])
+        out_reasons.append("redemarrage")
+    return out_groups, out_reasons
 
 
 def utterance_at(utterances: list[Utterance], time: float) -> Utterance | None:
