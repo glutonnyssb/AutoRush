@@ -145,3 +145,75 @@ def test_resume_des_blancs():
     assert resume
     assert all("count" in bucket and "removed" in bucket for bucket in resume.values())
     assert removed_total(transcript, settings) > 0
+
+
+# --------------------------------------------------------------------------- #
+# Bords des mots conserves aux raccords de suppression
+# --------------------------------------------------------------------------- #
+def test_la_marge_est_prise_sur_la_parole_supprimee_faute_de_silence():
+    """Une reprise enchainee n'offre aucun silence ou poser la marge.
+
+    Le moteur de transcription rapporte les attaques de mot trop tard. Si la
+    coupe tombe pile sur son horodatage, l'attaque du mot conserve est rognee.
+    La marge doit donc etre prise sur la parole supprimee, qui part de toute
+    facon.
+    """
+    from conftest import make_transcript
+
+    from autorush.analysis.decisions import analyze
+    from autorush.config import Settings
+
+    transcript = make_transcript(
+        [
+            ("C'est que le Japon est devenu la region la plus forte.", 0.8),
+            # la personne enchaine sans pause sur sa tentative ratee
+            ("Au debut du Ultimate c'etait plutot les Etats-Unis qui roulaient"
+             " sur tout le monde au debut c'etait vraiment les Etats-Unis qui"
+             " roulaient completement sur tout le monde.", 0.35),
+            ("Je pense notamment a Zachray qui etait clairement le meilleur.", 0.9),
+        ]
+    )
+    settings = Settings.for_style("dynamique")
+    result = analyze(transcript, settings, None, transcript.duration)
+
+    coupes = [g for g in result.gaps if g.removal and g.contains_removed_speech]
+    assert coupes, "la tentative ratee doit produire une coupe"
+    tolerance = settings.silence.word_edge_tolerance
+    for gap in coupes:
+        cut_start, cut_end = gap.removal
+        marge_avant = gap.end - cut_end
+        marge_apres = cut_start - gap.start
+        assert marge_avant >= tolerance - 1e-6, (
+            f"attaque du mot conserve rognee : {marge_avant * 1000:.1f} ms"
+        )
+        assert marge_apres >= tolerance - 1e-6, (
+            f"chute du mot conserve rognee : {marge_apres * 1000:.1f} ms"
+        )
+
+
+def test_la_marge_ne_devore_jamais_la_coupe():
+    """Les marges ne doivent pas annuler la suppression elle-meme.
+
+    Sinon les mots seraient marques supprimes mais leur audio resterait.
+    """
+    from conftest import make_transcript
+
+    from autorush.analysis.decisions import analyze
+    from autorush.config import Settings
+
+    transcript = make_transcript(
+        [
+            ("Le niveau global a explose cette saison.", 0.7),
+            ("Non, je recommence.", 0.12),
+            ("Le niveau global a vraiment explose cette saison.", 0.12),
+        ]
+    )
+    settings = Settings.for_style("dynamique")
+    result = analyze(transcript, settings, None, transcript.duration)
+    for gap in result.gaps:
+        if not gap.removal:
+            continue
+        cut_start, cut_end = gap.removal
+        assert cut_end > cut_start, "coupe inversee"
+        assert cut_start >= gap.start - 1e-6
+        assert cut_end <= gap.end + 1e-6

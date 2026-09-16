@@ -96,6 +96,12 @@ class SilenceSettings:
     min_shot_duration: float = 0.42
     #: on ne coupe pas un blanc s'il faut retirer moins que ca (bruit de coupe)
     min_removal: float = 0.09
+    #: marge toujours preservee autour d'un mot conserve, quitte a la prendre
+    #: sur la parole supprimee. Elle absorbe l'imprecision du moteur de
+    #: transcription, qui rapporte les fins de mot trop tot et les attaques
+    #: trop tard. Ce n'est pas un choix de rythme : c'est une compensation
+    #: technique, donc identique pour les trois styles.
+    word_edge_tolerance: float = 0.060
     #: garde une respiration audible si l'energie du blanc est elevee
     breath_energy_ratio: float = 0.055
     #: energie maximale d'un blanc encore considere comme une respiration

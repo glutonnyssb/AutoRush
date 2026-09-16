@@ -221,9 +221,23 @@ def plan_silences(
         free_before = max(0.0, end - max(previous_any.end, start))
 
         if contains_removed:
-            # le blanc englobe une mauvaise prise : on ne garde que les marges
-            keep_out = min(settings.pad_out, free_after)
-            keep_in = min(settings.pad_in, free_before)
+            # Le blanc englobe une mauvaise prise : on ne garde que les marges.
+            # Elles protegent les bords des mots CONSERVES, et quand la personne
+            # enchaine sans pause il n'y a pas de silence ou les prendre. On les
+            # prend alors sur la parole supprimee, qui part de toute facon :
+            # sinon la coupe tombe pile sur l'horodatage du moteur, qui rapporte
+            # les attaques trop tard, et le mot conserve est rogne.
+            tolerance = settings.word_edge_tolerance
+            keep_out = min(settings.pad_out, max(free_after, tolerance))
+            keep_in = min(settings.pad_in, max(free_before, tolerance))
+            # les marges ne doivent jamais devorer le blanc au point qu'il n'y
+            # ait plus rien a couper : la parole supprimee resterait audible.
+            budget = max(0.0, duration - settings.min_removal)
+            total = keep_out + keep_in
+            if total > budget and total > 0.0:
+                share = budget / total
+                keep_out *= share
+                keep_in *= share
             kept = keep_out + keep_in
             kind = "mauvaise_prise"
             reason = "blanc issu d'une suppression de parole"
