@@ -36,8 +36,10 @@ HARD_BREAK_GAP = 1.15
 MAX_WORDS = 48
 #: mots minimum de chaque cote pour scinder un enonce sur un redemarrage.
 #: En dessous, on est sur une repetition d'insistance ("tres tres fort"),
-#: pas sur deux tentatives de la meme phrase.
-MIN_RESTART_TAKE = 4
+#: pas sur deux tentatives de la meme phrase. Trois suffisent : "Et meme si
+#: au debut, et meme si..." doit se scinder, et sa reprise ne fait que trois
+#: mots.
+MIN_RESTART_TAKE = 3
 
 
 @dataclass

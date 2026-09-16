@@ -89,6 +89,10 @@ MARKER_CONFIDENCE_STRONG = 0.92
 MARKER_CONFIDENCE_WEAK = 0.70
 #: confiance d'un marqueur fort isole ("je recommence" seul)
 LONE_STRONG_MARKER_CONFIDENCE = 0.88
+#: longueur maximale d'un enonce reduit a un mot de liaison en suspens
+LONE_CONNECTOR_TOKENS = 2
+#: confiance de sa suppression : il ne porte aucun sens
+LONE_CONNECTOR_CONFIDENCE = 0.85
 
 
 @dataclass
@@ -537,6 +541,42 @@ def detect_retakes(
         group.attempts.sort(key=lambda a: a.start)
         groups.append(group)
         in_group.update(a.utterance_index for a in group.attempts)
+
+    # -- connecteurs restes en plan --------------------------------------- #
+    # "et", "mais", "donc" seuls, laisses en suspens avant un redemarrage :
+    # aucun contenu, aucune phrase. Ils n'ont pas besoin d'une version de
+    # reference pour etre retires, il n'y a rien a comparer.
+    for utterance in utterances:
+        if utterance.index in in_group or utterance.is_marker_only:
+            continue
+        if not utterance.is_abandoned:
+            continue
+        if utterance.token_count > LONE_CONNECTOR_TOKENS or utterance.content:
+            continue
+        if not utterance.ends_dangling and not utterance.ends_suspension:
+            continue
+        groups.append(
+            RetakeGroup(
+                index=len(groups),
+                kept_utterance_index=utterance.index,
+                kept_text="",
+                kept_start=utterance.end,
+                kept_end=utterance.end,
+                anchor="connecteur reste en plan",
+                attempts=[
+                    RetakeAttempt(
+                        utterance_index=utterance.index,
+                        start=utterance.start,
+                        end=utterance.end,
+                        text=utterance.text,
+                        role="attempt",
+                        confidence=LONE_CONNECTOR_CONFIDENCE,
+                        reason="mot de liaison laisse en plan, sans contenu",
+                    )
+                ],
+            )
+        )
+        in_group.add(utterance.index)
 
     # -- marqueurs forts isoles ------------------------------------------- #
     lone_markers: list[RetakeAttempt] = []

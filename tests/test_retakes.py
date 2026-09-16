@@ -263,3 +263,48 @@ def test_groupe_sans_ancrage_nest_pas_retenu():
     groups, _ = detect_retakes(utterances, settings.retake)
     for group in groups:
         assert group.attempts, "un groupe sans tentative ne doit pas exister"
+
+
+def test_un_connecteur_reste_en_plan_est_retire():
+    """``et`` seul, laisse en suspens avant un redemarrage, ne dit rien.
+
+    Cas releve sur un rush reel : "Et meme si au debut, Et meme si... / et /
+    meme si avec quelques joueurs..." laissait trois amorces dans le montage.
+    Un mot de liaison isole n'a besoin d'aucune version de reference pour
+    etre retire : il n'y a rien a comparer.
+    """
+    # blancs longs de chaque cote : "et" reste seul, comme sur le rush reel
+    result = run(
+        [
+            ("Le niveau a vraiment explose cette saison au Japon.", 0.8),
+            ("et", 1.6),
+            ("meme si quelques joueurs tenaient encore le niveau europeen.", 1.8),
+        ]
+    )
+    texte = final_text(result)
+    assert " et " not in f" {texte} ", f"le connecteur isole subsiste : {texte!r}"
+    assert "explose" in texte
+    assert "europeen" in texte
+
+
+def test_un_connecteur_porteur_de_sens_nest_pas_retire():
+    """``Et voila.`` porte un contenu : on n'y touche pas."""
+    result = run(
+        [
+            ("Le niveau a vraiment explose cette saison au Japon.", 0.8),
+            ("Et voila le resultat final du classement.", 0.6),
+        ]
+    )
+    assert "resultat" in final_text(result)
+
+
+def test_un_enonce_court_mais_fini_nest_pas_pris_pour_un_connecteur():
+    """Une phrase courte qui se termine proprement reste en place."""
+    result = run(
+        [
+            ("Le niveau a vraiment explose cette saison au Japon.", 0.8),
+            ("Enorme.", 0.6),
+            ("Les joueurs coreens ont fini juste derriere cette annee.", 0.6),
+        ]
+    )
+    assert "enorme" in final_text(result).lower()
