@@ -427,3 +427,98 @@ def test_bout_en_bout_sur_segmentation_reelle():
     assert len(build_utterances(transcript)) > len(segments), (
         "les segments fusionnes doivent avoir ete scindes"
     )
+
+
+# --------------------------------------------------------------------------- #
+# Normalisation orale et combinaison des mesures
+# --------------------------------------------------------------------------- #
+def test_les_tics_sont_retires_avant_comparaison():
+    """Une reprise ajoute et retire ses tics librement : ils ne comptent pas."""
+    from autorush.analysis.similarity import normalize_oral
+    from autorush.utils import tokenize
+
+    nettoye = normalize_oral(tokenize("et du coup euh en fait le niveau a monte"))
+    assert "euh" not in nettoye
+    for tic in ("coup", "fait"):
+        assert tic not in nettoye, f"{tic!r} devrait avoir disparu"
+    assert "niveau" in nettoye and "monte" in nettoye
+
+
+def test_les_tournures_equivalentes_sont_ramenees_a_une_forme():
+    """``pas mal de`` et ``quelques`` disent la meme chose a l'oral."""
+    from autorush.analysis.similarity import normalize_oral
+    from autorush.utils import tokenize
+
+    a = normalize_oral(tokenize("on avait pas mal de joueurs"))
+    b = normalize_oral(tokenize("on avait quelques joueurs"))
+    assert a == b
+
+
+def test_la_reformulation_avec_tournure_equivalente_est_reconnue():
+    resultat = text_similarity(
+        "Malgre tout, on avait quand meme pas mal de joueurs au Japon.",
+        "Malgre tout, on avait quand meme quelques excellents joueurs au Japon.",
+    )
+    assert resultat.restart_prefix or resultat.restart_structure
+    assert resultat.score >= 0.70
+
+
+def test_une_seule_mesure_elevee_suffit():
+    """La combinaison retient la meilleure mesure, elle ne fait pas la moyenne.
+
+    Une reprise qui garde sa phrase en changeant son attaque a une charpente
+    forte et un alignement moyen. Une moyenne la ferait passer sous le seuil.
+    """
+    resultat = text_similarity(
+        "Et pourtant, il faut savoir que ce n'est pas toujours ete le cas.",
+        "Mais pourtant, en fait, ca n'a pas toujours ete le cas.",
+    )
+    assert resultat.structure >= 0.60, "la charpente doit etre l'ancre ici"
+    assert resultat.align < resultat.structure, "l'alignement est la mesure faible"
+    assert resultat.score >= 0.90, "une ancre forte doit promouvoir le score"
+
+
+def test_le_recouvrement_seul_ne_promeut_jamais():
+    """Deux phrases du meme sujet se recouvrent sans etre une reprise.
+
+    Sans ancre structurelle, un recouvrement de contenu ne doit pas suffire.
+    """
+    resultat = text_similarity(
+        "Voici le classement complet de cette saison.",
+        "Le classement a beaucoup bouge en fin de saison.",
+    )
+    assert not (resultat.restart_prefix or resultat.restart_structure)
+    seuil = Settings.for_style("dynamique").retake.similarity_without_marker
+    assert resultat.score < seuil
+
+
+def test_une_phrase_de_contenu_nest_jamais_remplacee_par_un_connecteur():
+    """``Et.`` ne remplace pas une phrase : elle ne dit rien."""
+    from autorush.analysis.retakes import _replacement_too_thin
+    from autorush.analysis.utterances import build_utterances
+
+    transcript = make_transcript(
+        [
+            ("Le niveau global a vraiment explose cette saison au Japon.", 0.7),
+            ("Et.", 0.9),
+        ]
+    )
+    utterances = build_utterances(transcript)
+    assert _replacement_too_thin(utterances[0], utterances[-1])
+    # et la phrase survit au traitement complet
+    result = analyze(
+        transcript, Settings.for_style("dynamique"), None, transcript.duration
+    )
+    assert "explose" in final_text(result).lower()
+
+
+def test_une_amorce_interrompue_est_promue_sans_ressembler_beaucoup():
+    """Une amorce coupee est trop courte pour ressembler a la version longue.
+
+    La preuve vient du contexte : elle s'arrete en plan.
+    """
+    complet = text_similarity("On a eu Acola Miya", "On a eu Acola Miya Asimo Hurt Raru.")
+    interrompu = text_similarity(
+        "On a eu Acola Miya", "On a eu Acola Miya Asimo Hurt Raru.", a_interrupted=True
+    )
+    assert interrompu.score >= complet.score

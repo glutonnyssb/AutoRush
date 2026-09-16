@@ -152,11 +152,12 @@ class RetakeSettings:
 
     enabled: bool = True
     #: similarite minimale quand un marqueur explicite ("je recommence") est present
-    similarity_with_marker: float = 0.32
+    similarity_with_marker: float = 0.50
     #: similarite minimale sans marqueur (plus severe : la preuve doit venir
-    #: du seul vocabulaire). Mesure sur rush reel : une vraie reprise depasse
-    #: 0.56, deux phrases voisines du meme sujet montent au plus a 0.46.
-    similarity_without_marker: float = 0.50
+    #: du seul vocabulaire). Mesure sur rush reel : une vraie reprise est
+    #: promue a 0.90 ou plus, deux phrases voisines du meme sujet plafonnent
+    #: a 0.38. Le seuil se pose largement entre les deux.
+    similarity_without_marker: float = 0.70
     #: fenetre de recherche de la nouvelle tentative (secondes)
     search_window: float = 26.0
     #: nombre d'enonces separant au maximum deux tentatives
@@ -451,8 +452,8 @@ STYLE_PRESETS: dict[str, dict[str, dict[str, Any]]] = {
             "min_delete_confidence": 0.64,
         },
         "retake": {
-            "similarity_with_marker": 0.36,
-            "similarity_without_marker": 0.56,
+            "similarity_with_marker": 0.55,
+            "similarity_without_marker": 0.75,
             "min_delete_confidence": 0.64,
             "max_removed_speech_ratio": 0.5,
         },
@@ -490,8 +491,8 @@ STYLE_PRESETS: dict[str, dict[str, dict[str, Any]]] = {
             "min_delete_confidence": 0.60,
         },
         "retake": {
-            "similarity_with_marker": 0.32,
-            "similarity_without_marker": 0.50,
+            "similarity_with_marker": 0.50,
+            "similarity_without_marker": 0.70,
             "min_delete_confidence": 0.60,
             "max_removed_speech_ratio": 0.55,
         },
@@ -529,8 +530,8 @@ STYLE_PRESETS: dict[str, dict[str, dict[str, Any]]] = {
             "min_delete_confidence": 0.56,
         },
         "retake": {
-            "similarity_with_marker": 0.28,
-            "similarity_without_marker": 0.46,
+            "similarity_with_marker": 0.45,
+            "similarity_without_marker": 0.65,
             "min_delete_confidence": 0.56,
             "max_removed_speech_ratio": 0.62,
         },

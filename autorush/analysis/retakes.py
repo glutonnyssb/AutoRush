@@ -48,6 +48,13 @@ from autorush.utils import clamp
 #: sont presents : la preuve vient alors du contexte, plus du vocabulaire.
 RESTART_GATE = 0.30
 
+#: Une phrase porteuse de contenu ne peut jamais etre remplacee par un
+#: enonce squelettique ("Et.", "Non.", "Mais bon."). Meme tres ressemblants,
+#: ces deux enonces ne sont pas deux tentatives de la meme phrase : la
+#: seconde ne dit rien.
+PROTECTED_CONTENT_WORDS = 5
+THIN_REPLACEMENT_WORDS = 1
+
 #: bonus de confiance
 BONUS_STRONG_MARKER = 0.16
 BONUS_WEAK_MARKER = 0.08
@@ -190,6 +197,14 @@ def _passes_gate(
     ):
         return True
     return False
+
+
+def _replacement_too_thin(utterance: Utterance, kept: Utterance) -> bool:
+    """La version conservee est-elle trop maigre pour remplacer la tentative ?"""
+    return (
+        len(utterance.content) >= PROTECTED_CONTENT_WORDS
+        and len(kept.content) <= THIN_REPLACEMENT_WORDS
+    )
 
 
 def _is_candidate_attempt(
@@ -336,7 +351,11 @@ def detect_retakes(
                 distance += 1
                 continue
 
-            similarity = token_similarity(candidate.tokens, kept.tokens)
+            if _replacement_too_thin(candidate, kept):
+                break
+            similarity = token_similarity(
+                candidate.tokens, kept.tokens, a_interrupted=candidate.is_abandoned
+            )
             marker_between = group_strong or group_weak
             ok, why = _is_candidate_attempt(candidate, similarity, marker_between, settings)
             if not ok:
