@@ -106,3 +106,26 @@ def test_transcription_vide():
     from autorush.transcription.base import Transcript
 
     assert build_utterances(Transcript()) == []
+
+
+def test_une_ponctuation_forte_empeche_de_croire_la_phrase_coupee():
+    """``ca passait pas trop.`` est une phrase finie.
+
+    ``trop`` peut annoncer une suite (``c'etait trop...``), mais un point
+    tranche. Sans cette regle, toute phrase finissant sur un mot de liaison
+    passait pour abandonnee, et ne pouvait plus servir de version conservee.
+    """
+    from conftest import make_transcript
+
+    from autorush.analysis.utterances import build_utterances
+
+    transcript = make_transcript([("Ca passait pas trop.", 0.5)])
+    utterance = build_utterances(transcript)[0]
+    assert not utterance.ends_dangling
+    assert not utterance.is_abandoned
+    assert utterance.is_complete
+
+    # sans ponctuation, le doute revient
+    transcript = make_transcript([("Ca passait pas trop", 0.5)])
+    ouverte = build_utterances(transcript)[0]
+    assert ouverte.ends_dangling

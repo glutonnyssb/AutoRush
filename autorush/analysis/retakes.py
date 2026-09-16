@@ -199,6 +199,32 @@ def _passes_gate(
     return False
 
 
+def _kept_is_weaker(
+    utterance: Utterance, kept: Utterance, similarity: SimilarityResult
+) -> bool:
+    """La version dite "conservee" est-elle en fait la moins bonne des deux ?
+
+    Rien ne garantit que la derniere tentative soit la bonne : une personne
+    qui se reprend s'arrete souvent en plan avant de repartir, et le moteur
+    de transcription tronque volontiers son dernier segment. Supprimer la
+    phrase complete au profit de cette amorce ferait perdre le propos.
+
+    Deux situations :
+
+    * la version conservee est visiblement abandonnee alors que la tentative
+      allait au bout ;
+    * la version conservee redit le debut de la tentative sans rien ajouter
+      et en disant moins : c'est elle qui est l'amorce.
+    """
+    if kept.is_abandoned and not utterance.is_abandoned:
+        return True
+    return (
+        utterance.is_complete
+        and not similarity.gained_content
+        and len(kept.content) < len(utterance.content)
+    )
+
+
 def _replacement_too_thin(utterance: Utterance, kept: Utterance) -> bool:
     """La version conservee est-elle trop maigre pour remplacer la tentative ?"""
     return (
@@ -356,6 +382,8 @@ def detect_retakes(
             similarity = token_similarity(
                 candidate.tokens, kept.tokens, a_interrupted=candidate.is_abandoned
             )
+            if _kept_is_weaker(candidate, kept, similarity):
+                break
             marker_between = group_strong or group_weak
             ok, why = _is_candidate_attempt(candidate, similarity, marker_between, settings)
             if not ok:
@@ -430,6 +458,73 @@ def detect_retakes(
                 )
             )
 
+        group.attempts.sort(key=lambda a: a.start)
+        groups.append(group)
+        in_group.update(a.utterance_index for a in group.attempts)
+
+    # -- chaines descendantes --------------------------------------------- #
+    # La passe precedente cherche, pour chaque enonce, une meilleure version
+    # *plus recente*. Elle ne voit donc rien quand la personne s'essouffle :
+    # une ouverture ratee ou chaque tentative est plus courte que la
+    # precedente. La meilleure version est alors la premiere, et ce sont les
+    # suivantes qu'il faut retirer.
+    for position, best in enumerate(utterances):
+        if best.index in in_group or best.is_marker_only:
+            continue
+        if not best.is_complete or best.is_abandoned:
+            continue
+        collected = []
+        distance = 0
+        cursor = position + 1
+        while cursor < len(utterances) and distance < settings.max_utterance_distance:
+            candidate = utterances[cursor]
+            if candidate.index in in_group or candidate.is_marker_only:
+                break
+            if candidate.start - best.end > settings.search_window:
+                break
+            similarity = token_similarity(
+                best.tokens, candidate.tokens, a_interrupted=candidate.is_abandoned
+            )
+            # on ne retire une tentative posterieure que si elle est
+            # visiblement la plus faible des deux
+            if not _kept_is_weaker(best, candidate, similarity):
+                break
+            if not _passes_gate(similarity, False, settings):
+                break
+            collected.append((candidate, similarity))
+            cursor += 1
+            distance += 1
+
+        if not collected:
+            continue
+
+        group = RetakeGroup(
+            index=len(groups),
+            kept_utterance_index=best.index,
+            kept_text=best.text,
+            kept_start=best.start,
+            kept_end=best.end,
+            anchor="version la plus complete conservee",
+        )
+        for candidate, similarity in collected:
+            confidence, reasons, lost = _attempt_confidence(
+                candidate, best, similarity, False, False, settings
+            )
+            group.attempts.append(
+                RetakeAttempt(
+                    utterance_index=candidate.index,
+                    start=candidate.start,
+                    end=candidate.end,
+                    text=candidate.text,
+                    role="attempt",
+                    confidence=confidence,
+                    reason="; ".join(
+                        ["tentative plus faible que la version precedente", *reasons]
+                    ),
+                    similarity=similarity,
+                    lost_content=lost,
+                )
+            )
         group.attempts.sort(key=lambda a: a.start)
         groups.append(group)
         in_group.update(a.utterance_index for a in group.attempts)

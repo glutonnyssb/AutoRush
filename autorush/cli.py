@@ -128,11 +128,28 @@ def build_parser() -> argparse.ArgumentParser:
     cache = subparsers.add_parser("cache", help="gerer le cache de transcription")
     cache.add_argument("--clear", action="store_true", help="vider le cache")
 
+    diag = subparsers.add_parser(
+        "diagnose",
+        help="expliquer, enonce par enonce, ce que l'analyse voit et decide",
+    )
+    diag.add_argument("input", help="fichier video ou audio")
+    diag.add_argument("--style", choices=STYLE_CHOICES, default="dynamique")
+    diag.add_argument("--lang", default="auto")
+    diag.add_argument("--model", default="medium")
+    diag.add_argument("--device", default="auto")
+    diag.add_argument(
+        "--transcript", type=Path, default=None, help="transcription deja produite"
+    )
+    diag.add_argument(
+        "--until", type=float, default=60.0,
+        help="n'examiner que les N premieres secondes (0 = tout)",
+    )
+
     return parser
 
 
 #: sous-commandes reconnues ; tout le reste est considere comme un fichier
-COMMANDS = frozenset({"process", "doctor", "gui", "demo", "cache"})
+COMMANDS = frozenset({"process", "doctor", "gui", "demo", "cache", "diagnose"})
 
 
 def normalize_argv(argv: list[str]) -> list[str]:
@@ -510,6 +527,121 @@ def command_doctor(args: argparse.Namespace) -> int:
     return 1 if problems else 0
 
 
+def command_diagnose(args: argparse.Namespace) -> int:
+    """Explique enonce par enonce ce que l'analyse voit, et ce qu'elle decide.
+
+    Sert a comprendre pourquoi une reprise n'est pas coupee : on voit le
+    decoupage, le score de chaque paire, l'ancre trouvee ou non, le verdict de
+    la porte, puis la confiance finale. La sortie est faite pour etre collee
+    telle quelle dans un rapport de bug.
+    """
+    import tempfile
+
+    from autorush.analysis.retakes import _passes_gate, detect_retakes
+    from autorush.analysis.similarity import token_similarity
+    from autorush.analysis.utterances import build_utterances
+    from autorush.media.ffmpeg import extract_audio, probe_media
+    from autorush.transcription.io import load_transcript
+
+    console = Console()
+    settings = settings_from_args(args)
+    retake = settings.retake
+    limite = float(args.until or 0.0)
+
+    # Avec une transcription deja produite, la video n'est pas necessaire :
+    # on peut diagnostiquer un montage a posteriori.
+    if args.transcript:
+        transcript = load_transcript(args.transcript)
+        nom = Path(args.input).name if args.input else args.transcript.name
+    else:
+        media = probe_media(Path(args.input))
+        nom = media.path.name
+        from autorush.transcription.whisper_backend import WhisperBackend
+
+        with tempfile.TemporaryDirectory(prefix="autorush-diag-") as work:  # noqa: SIM117
+            audio = Path(work) / "audio16k.wav"
+            extract_audio(media.path, audio, sample_rate=16000, mono=True,
+                          duration=media.duration)
+            transcript = WhisperBackend(settings.transcription).transcribe(
+                audio, media_path=media.path, duration=media.duration
+            )
+
+    utterances = build_utterances(transcript)
+    if limite > 0:
+        utterances = [u for u in utterances if u.start < limite]
+
+    console.title(f"{APP_NAME} {__version__} - diagnostic")
+    console.item("Rush", nom)
+    console.item("Style", style_label(settings.style))
+    console.item("Seuil sans marqueur", f"{retake.similarity_without_marker:.2f}")
+    console.item("Seuil avec marqueur", f"{retake.similarity_with_marker:.2f}")
+    console.item("Confiance minimale", f"{retake.min_delete_confidence:.2f}")
+    console.item("Mots transcrits", str(transcript.word_count()))
+    console.write()
+
+    console.write("ENONCES")
+    for utterance in utterances:
+        marques = []
+        if utterance.is_abandoned:
+            marques.append("abandonne")
+        if utterance.is_complete:
+            marques.append("complet")
+        if utterance.is_marker_only:
+            marques.append("marqueur")
+        suffixe = f"  [{', '.join(marques)}]" if marques else ""
+        console.write(
+            f"  {utterance.index:3} {format_timecode(utterance.start)}"
+            f" ({utterance.break_reason:11}) {utterance.text[:62]}{suffixe}"
+        )
+
+    console.write()
+    console.write("PAIRES COMPAREES  (tentative -> version plus recente)")
+    for position, kept in enumerate(utterances):
+        for back in range(1, retake.max_utterance_distance + 1):
+            index = position - back
+            if index < 0:
+                break
+            candidate = utterances[index]
+            if kept.start - candidate.end > retake.search_window:
+                break
+            similarity = token_similarity(
+                candidate.tokens, kept.tokens, a_interrupted=candidate.is_abandoned
+            )
+            ancre = (
+                "prefixe" if similarity.restart_prefix
+                else "charpente" if similarity.restart_structure
+                else "AUCUNE"
+            )
+            passe = _passes_gate(similarity, False, retake)
+            console.write(
+                f"  {candidate.index:3} -> {kept.index:3}"
+                f"  score={similarity.score:.3f} ancre={ancre:9}"
+                f" align={similarity.align:.2f} bag={similarity.bag:.2f}"
+                f" charpente={similarity.structure:.2f}"
+                f"  {'RETENU' if passe else 'rejete'}"
+            )
+
+    groups, lone = detect_retakes(utterances, retake)
+    console.write()
+    console.write(f"DECISIONS  ({len(groups)} groupes, {len(lone)} marqueurs isoles)")
+    for group in groups:
+        console.write(f"  garde : {group.kept_text[:66]}")
+        console.write(f"          ancrage = {group.anchor}")
+        for attempt in group.attempts:
+            verdict = (
+                "SUPPRIME" if attempt.confidence >= retake.min_delete_confidence
+                else "signale"
+            )
+            console.write(
+                f"    [{verdict}] confiance={attempt.confidence:.2f}"
+                f"  {attempt.text[:54]}"
+            )
+            console.write(f"               {attempt.reason[:96]}")
+    if not groups:
+        console.write("  aucune reprise detectee")
+    return 0
+
+
 def command_demo(args: argparse.Namespace) -> int:
     """Produit un montage de demonstration sans avoir besoin d'une video."""
     from autorush.analysis.decisions import analyze
@@ -660,6 +792,8 @@ def main(argv: list[str] | None = None) -> int:
         return command_demo(args)
     if command == "cache":
         return command_cache(args)
+    if command == "diagnose":
+        return command_diagnose(args)
 
     if not getattr(args, "input", None):
         # ``--save-settings`` seul est un usage legitime : produire un fichier

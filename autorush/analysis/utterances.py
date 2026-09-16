@@ -117,8 +117,14 @@ class Utterance:
 
     @property
     def ends_dangling(self) -> bool:
-        """Se termine sur un mot de liaison : phrase presque surement coupee."""
+        """Se termine sur un mot de liaison : phrase presque surement coupee.
+
+        La ponctuation forte tranche : ``ca passait pas trop.`` est une phrase
+        finie, meme si ``trop`` peut par ailleurs annoncer une suite.
+        """
         if not self.tokens:
+            return False
+        if self.ends_terminal:
             return False
         return is_dangling(self.tokens[-1])
 

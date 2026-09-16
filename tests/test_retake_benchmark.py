@@ -522,3 +522,72 @@ def test_une_amorce_interrompue_est_promue_sans_ressembler_beaucoup():
         "On a eu Acola Miya", "On a eu Acola Miya Asimo Hurt Raru.", a_interrupted=True
     )
     assert interrompu.score >= complet.score
+
+
+# --------------------------------------------------------------------------- #
+# Chaines de tentatives : l'ouverture dite quatre fois
+# --------------------------------------------------------------------------- #
+# Rien ne garantit que la derniere tentative soit la bonne. Une personne qui
+# bute sur son ouverture peut s'ameliorer (chaine montante), s'essouffler
+# (chaine descendante) ou s'arreter en plan. Dans les quatre cas la version
+# complete doit survivre, et elle seule.
+
+_OUVERTURE = "Aujourd'hui quand on parle de Smash Ultimate il y a un point"
+_COMPLETE = f"{_OUVERTURE} sur lequel tout le monde est d'accord."
+_TENTATIVES = [
+    f"{_OUVERTURE}.",
+    f"{_OUVERTURE} sur lequel.",
+    f"{_OUVERTURE} sur lequel tout le monde.",
+]
+
+CHAINES: dict[str, list[str]] = {
+    "montante": [*_TENTATIVES, _COMPLETE],
+    "descendante": [_COMPLETE, *reversed(_TENTATIVES)],
+    "identiques": [_COMPLETE] * 4,
+    "derniere_tronquee": [_COMPLETE, _TENTATIVES[0]],
+    "derniere_abandonnee": [_COMPLETE, f"{_OUVERTURE} sur..."],
+}
+
+
+def _monter_chaine(textes: list[str]):
+    lignes = [(texte, 0.6) for texte in textes]
+    transcript = make_transcript(lignes)
+    return analyze(
+        transcript, Settings.for_style("dynamique"), None, transcript.duration
+    )
+
+
+def test_une_chaine_ne_laisse_quune_seule_ouverture():
+    for nom, textes in CHAINES.items():
+        texte = final_text(_monter_chaine(textes)).lower()
+        assert texte.count("aujourd") == 1, (
+            f"chaine {nom} : {texte.count('aujourd')} ouvertures au lieu d'une"
+        )
+
+
+def test_une_chaine_conserve_toujours_la_version_complete():
+    """Le sens ne doit jamais se perdre, quel que soit l'ordre des tentatives."""
+    for nom, textes in CHAINES.items():
+        texte = final_text(_monter_chaine(textes)).lower()
+        assert "tout le monde est d'accord" in texte, (
+            f"chaine {nom} : la version complete a disparu -> {texte[:70]!r}"
+        )
+
+
+def test_une_tentative_abandonnee_ne_remplace_jamais_une_phrase_finie():
+    """``il y a un...`` ne peut pas evincer la phrase entiere."""
+    resultat = _monter_chaine(CHAINES["derniere_abandonnee"])
+    texte = final_text(resultat).lower()
+    assert "est d'accord" in texte
+    assert "il y a un..." not in texte
+
+
+def test_une_enumeration_legitime_survit_a_la_passe_descendante():
+    """Deux elements d'une liste se ressemblent sans etre une reprise."""
+    resultat = _monter_chaine(
+        [
+            "On a teste les nouveaux persos cette semaine.",
+            "On a teste les nouvelles mecaniques aussi.",
+        ]
+    )
+    assert not resultat.removed_word_indices
