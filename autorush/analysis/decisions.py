@@ -387,6 +387,8 @@ def analyze(
         cut_reasons=cut_reasons,
     )
 
+    _reconcile_removals(result)
+
     result.stats = _build_stats(result, settings)
     log.info(
         "Montage : %s -> %s (%d plans, %d coupes)",
@@ -399,6 +401,70 @@ def analyze(
 
 
 # --------------------------------------------------------------------------- #
+def _reconcile_removals(result: AnalysisResult) -> None:
+    """Interdit au rapport d'annoncer une coupe qui n'a pas eu lieu.
+
+    Un mot est annonce supprime parce qu'une decision l'a marque. Mais le
+    montage, lui, ne connait que des bornes de plans : la duree minimale d'un
+    plan peut etendre un plan trop court sur la zone voisine, et y ramener de
+    la parole censee partir. Le mot reste alors dans l'image et dans le son,
+    tout en etant absent du rapport.
+
+    On verifie donc, apres construction de la timeline, que chaque mot annonce
+    supprime est bien hors des plans. Ceux qui y sont encore sont remis dans
+    le montage - ils y sont deja - et signales, pour que le rapport decrive le
+    fichier reellement produit.
+    """
+    if not result.removed_word_indices or not result.timeline.shots:
+        return
+
+    words = {word.index: word for word in result.transcript.words}
+    survivants: list[int] = []
+    for index in sorted(result.removed_word_indices):
+        word = words.get(index)
+        if word is None:
+            continue
+        center = 0.5 * (word.start + word.end)
+        if any(
+            shot.source_start <= center <= shot.source_end
+            for shot in result.timeline.shots
+        ):
+            survivants.append(index)
+
+    if not survivants:
+        return
+
+    result.removed_word_indices.difference_update(survivants)
+    result.benign_word_indices.difference_update(survivants)
+    for removal in result.removals:
+        if removal.applied and set(removal.word_indices) & set(survivants):
+            removal.applied = False
+
+    conserves = [words[i] for i in survivants]
+    texte = " ".join(word.clean for word in conserves)
+    result.flags.append(
+        Flag(
+            start=min(word.start for word in conserves),
+            end=max(word.end for word in conserves),
+            category="coupe_non_appliquee",
+            confidence=1.0,
+            reason=(
+                f"{len(survivants)} mot(s) annonces supprimes sont restes dans le"
+                " montage : la duree minimale d'un plan a recouvert la coupe"
+            ),
+            text=texte[:200],
+            suggestion=(
+                "baisser min_shot_duration, ou couper ce passage a la main"
+            ),
+        )
+    )
+    log.warning(
+        "%d mots marques supprimes sont restes dans le montage : %s",
+        len(survivants),
+        texte[:120],
+    )
+
+
 def _apply_speech_cap(result: AnalysisResult, settings: Settings) -> None:
     """Limite la part de parole supprimee par les reprises et les fragments.
 

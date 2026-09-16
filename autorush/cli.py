@@ -626,6 +626,25 @@ def command_diagnose(args: argparse.Namespace) -> int:
                 f"  {'RETENU' if passe else 'rejete'}"
             )
 
+    # Ce que le montage contient reellement, par opposition a ce que le
+    # rapport annonce : c'est la seule facon de voir une coupe promise mais
+    # non appliquee.
+    from autorush.analysis.decisions import analyze
+
+    analysis = analyze(transcript, settings, None, transcript.duration)
+    console.write()
+    console.write("MONTAGE REELLEMENT PRODUIT")
+    console.item("Duree d'origine", human_duration(analysis.timeline.source_duration))
+    console.item("Duree montee", human_duration(analysis.timeline.duration))
+    console.item("Plans", str(len(analysis.timeline.shots)))
+    console.item("Mots retires", str(len(analysis.removed_word_indices)))
+    non_appliquees = [f for f in analysis.flags if f.category == "coupe_non_appliquee"]
+    if non_appliquees:
+        console.write("  ATTENTION : des coupes annoncees n'ont pas eu lieu")
+        for flag in non_appliquees:
+            console.write(f"    {flag.reason}")
+            console.write(f"    reste dans le montage : {flag.text[:80]}")
+
     groups, lone = detect_retakes(utterances, retake)
     console.write()
     console.write(f"DECISIONS  ({len(groups)} groupes, {len(lone)} marqueurs isoles)")

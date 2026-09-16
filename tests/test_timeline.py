@@ -115,3 +115,44 @@ def test_fps_invalide_leve_une_erreur():
     _, _, timeline = build()
     with pytest.raises(ValueError):
         frame_clips(timeline, 0.0)
+
+
+def test_le_rapport_nannonce_jamais_une_coupe_non_appliquee():
+    """Un mot annonce supprime doit etre reellement hors des plans.
+
+    La duree minimale d'un plan peut etendre un plan trop court sur la zone
+    voisine et y ramener de la parole censee partir. Le mot resterait alors
+    dans l'image et le son tout en etant absent du rapport : le montage
+    decrit ne serait pas le montage produit.
+    """
+    from conftest import make_transcript
+
+    from autorush.analysis.decisions import analyze
+    from autorush.config import Settings
+
+    ouverture = "Aujourd'hui quand on parle de Smash Ultimate il y a un point"
+    transcript = make_transcript(
+        [
+            (f"{ouverture}.", 0.5),
+            (f"{ouverture} sur lequel tout le monde est d'accord.", 0.4),
+        ]
+    )
+    # une duree de plan absurde force la coupe a etre recouverte
+    settings = Settings.for_style("dynamique")
+    settings.silence.min_shot_duration = 12.0
+    result = analyze(transcript, settings, None, transcript.duration)
+
+    mots = {word.index: word for word in result.transcript.words}
+    for index in result.removed_word_indices:
+        word = mots[index]
+        centre = 0.5 * (word.start + word.end)
+        dans_un_plan = any(
+            shot.source_start <= centre <= shot.source_end
+            for shot in result.timeline.shots
+        )
+        assert not dans_un_plan, (
+            f"{word.clean!r} est annonce supprime mais reste dans le montage"
+        )
+    assert [f for f in result.flags if f.category == "coupe_non_appliquee"], (
+        "la coupe recouverte doit etre signalee"
+    )
