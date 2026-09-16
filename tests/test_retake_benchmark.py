@@ -591,3 +591,73 @@ def test_une_enumeration_legitime_survit_a_la_passe_descendante():
         ]
     )
     assert not resultat.removed_word_indices
+
+
+# --------------------------------------------------------------------------- #
+# Reformulation ou troncature : qui des deux versions garder
+# --------------------------------------------------------------------------- #
+# Une tentative plus courte n'est pas forcement moins bonne. Se corriger en
+# disant moins est normal. Ce qui distingue une correction d'une amorce
+# avortee, c'est l'attaque : une troncature reproduit l'attaque a
+# l'identique et s'arrete en route, une reformulation refait son attaque.
+
+def test_une_reformulation_plus_courte_reste_la_bonne_version():
+    """Cas releve sur le rush reel de l'utilisateur.
+
+    "Et pourtant faut savoir que ca n'a pas toujours ete le cas." est reprise
+    en "Mais pourtant en fait ca n'a pas toujours ete le cas." : l'attaque
+    change, donc la seconde est la correction, meme si elle dit moins.
+    """
+    transcript = make_transcript(
+        [
+            ("Et pourtant faut savoir que ca n'a pas toujours ete le cas.", 0.6),
+            ("Mais pourtant en fait ca n'a pas toujours ete le cas.", 0.6),
+        ]
+    )
+    result = analyze(
+        transcript, Settings.for_style("dynamique"), None, transcript.duration
+    )
+    texte = final_text(result).lower()
+    assert "mais pourtant" in texte, "la correction doit survivre"
+    assert "faut savoir" not in texte, "la premiere tentative doit partir"
+
+
+def test_une_troncature_ne_remplace_jamais_la_phrase_entiere():
+    """L'attaque identique trahit l'amorce : c'est elle qui part."""
+    transcript = make_transcript(
+        [
+            ("Aujourd'hui quand on parle de Smash Ultimate il y a un point sur"
+             " lequel tout le monde est d'accord.", 0.6),
+            ("Aujourd'hui quand on parle de Smash Ultimate il y a un point.", 0.6),
+        ]
+    )
+    result = analyze(
+        transcript, Settings.for_style("dynamique"), None, transcript.duration
+    )
+    assert "est d'accord" in final_text(result).lower()
+
+
+def test_lattaque_distingue_troncature_et_reformulation():
+    """La mesure doit separer les deux populations sans ambiguite."""
+    reformulations = [
+        text_similarity(
+            "Et pourtant faut savoir que ca n'a pas toujours ete le cas.",
+            "Mais pourtant en fait ca n'a pas toujours ete le cas.",
+        ),
+        text_similarity(
+            "Malgre tout on avait quand meme pas mal de joueurs au Japon qui se"
+            " defendaient tres bien.",
+            "Malgre tout on avait quand meme quelques excellents joueurs au Japon.",
+        ),
+    ]
+    ouverture = "Aujourd'hui quand on parle de Smash Ultimate il y a un point"
+    troncatures = [
+        text_similarity(f"{ouverture} sur lequel tout le monde est d'accord.", court)
+        for court in (f"{ouverture}.", f"{ouverture} sur lequel.", f"{ouverture} sur...")
+    ]
+    from autorush.analysis.retakes import TRUNCATION_OPENING
+
+    for resultat in troncatures:
+        assert resultat.opening >= TRUNCATION_OPENING
+    for resultat in reformulations:
+        assert resultat.opening < TRUNCATION_OPENING

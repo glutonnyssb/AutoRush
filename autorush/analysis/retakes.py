@@ -55,6 +55,13 @@ RESTART_GATE = 0.30
 PROTECTED_CONTENT_WORDS = 5
 THIN_REPLACEMENT_WORDS = 1
 
+#: Une tentative qui reproduit l'attaque a l'identique sans rien ajouter
+#: s'est arretee en route. Une vraie correction, elle, refait son attaque
+#: ("Et pourtant faut savoir que..." repris en "Mais pourtant en fait...")
+#: et a le droit d'etre plus courte. Mesure sur rush reel : une troncature
+#: a une attaque commune de 1.00, une reformulation plafonne a 0.73.
+TRUNCATION_OPENING = 0.95
+
 #: bonus de confiance
 BONUS_STRONG_MARKER = 0.16
 BONUS_WEAK_MARKER = 0.08
@@ -213,8 +220,9 @@ def _kept_is_weaker(
 
     * la version conservee est visiblement abandonnee alors que la tentative
       allait au bout ;
-    * la version conservee redit le debut de la tentative sans rien ajouter
-      et en disant moins : c'est elle qui est l'amorce.
+    * la version conservee reproduit l'attaque a l'identique, n'ajoute rien
+      et dit moins : elle s'est arretee en route. Une reformulation, qui
+      refait son attaque, garde en revanche le droit d'etre plus courte.
     """
     if kept.is_abandoned and not utterance.is_abandoned:
         return True
@@ -222,6 +230,7 @@ def _kept_is_weaker(
         utterance.is_complete
         and not similarity.gained_content
         and len(kept.content) < len(utterance.content)
+        and similarity.opening >= TRUNCATION_OPENING
     )
 
 

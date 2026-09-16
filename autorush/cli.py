@@ -589,10 +589,15 @@ def command_diagnose(args: argparse.Namespace) -> int:
         if utterance.is_marker_only:
             marques.append("marqueur")
         suffixe = f"  [{', '.join(marques)}]" if marques else ""
+        # La duree et le nombre de mots comptent autant que le texte : un
+        # enonce de 13 s contient forcement plusieurs tentatives, et c'est
+        # invisible sur un texte tronque a l'affichage.
         console.write(
             f"  {utterance.index:3} {format_timecode(utterance.start)}"
-            f" ({utterance.break_reason:11}) {utterance.text[:62]}{suffixe}"
+            f" {utterance.duration:5.1f}s {utterance.token_count:3} mots"
+            f" ({utterance.break_reason:11}){suffixe}"
         )
+        console.write(f"        {utterance.text[:100]}")
 
     console.write()
     console.write("PAIRES COMPAREES  (tentative -> version plus recente)")
